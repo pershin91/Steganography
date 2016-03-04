@@ -28,9 +28,8 @@ namespace winForms {
 			//
 		}\
 
-			int size = 31000000;
-
 	public:
+		int size = 31000000;
 		array<Char>^ buffer = gcnew array<Char>(size);
 	protected:
 		/// <summary>
@@ -79,17 +78,18 @@ namespace winForms {
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(12, 112);
+			this->button1->Location = System::Drawing::Point(12, 100);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(143, 34);
 			this->button1->TabIndex = 0;
 			this->button1->Text = L"Открыть";
 			this->button1->UseVisualStyleBackColor = true;
+			this->button1->Click += gcnew System::EventHandler(this, &MyForm::button1_Click);
 			// 
 			// textBox1
 			// 
 			this->textBox1->Enabled = false;
-			this->textBox1->Location = System::Drawing::Point(161, 118);
+			this->textBox1->Location = System::Drawing::Point(161, 106);
 			this->textBox1->Name = L"textBox1";
 			this->textBox1->Size = System::Drawing::Size(272, 22);
 			this->textBox1->TabIndex = 1;
@@ -97,7 +97,7 @@ namespace winForms {
 			// label1
 			// 
 			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(12, 159);
+			this->label1->Location = System::Drawing::Point(12, 147);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(143, 17);
 			this->label1->TabIndex = 2;
@@ -105,28 +105,30 @@ namespace winForms {
 			// 
 			// textBox2
 			// 
-			this->textBox2->Location = System::Drawing::Point(161, 157);
+			this->textBox2->Location = System::Drawing::Point(161, 145);
 			this->textBox2->Name = L"textBox2";
 			this->textBox2->Size = System::Drawing::Size(272, 22);
 			this->textBox2->TabIndex = 3;
 			// 
 			// button2
 			// 
-			this->button2->Location = System::Drawing::Point(12, 200);
+			this->button2->Location = System::Drawing::Point(12, 188);
 			this->button2->Name = L"button2";
 			this->button2->Size = System::Drawing::Size(208, 34);
 			this->button2->TabIndex = 4;
 			this->button2->Text = L"Спрятать сообщение";
 			this->button2->UseVisualStyleBackColor = true;
+			this->button2->Click += gcnew System::EventHandler(this, &MyForm::button2_Click);
 			// 
 			// button3
 			// 
-			this->button3->Location = System::Drawing::Point(226, 200);
+			this->button3->Location = System::Drawing::Point(226, 188);
 			this->button3->Name = L"button3";
 			this->button3->Size = System::Drawing::Size(207, 34);
 			this->button3->TabIndex = 5;
 			this->button3->Text = L"Раскрыть сообщение";
 			this->button3->UseVisualStyleBackColor = true;
+			this->button3->Click += gcnew System::EventHandler(this, &MyForm::button3_Click);
 			// 
 			// button4
 			// 
@@ -138,6 +140,7 @@ namespace winForms {
 			this->button4->TabIndex = 7;
 			this->button4->Text = L"Воспроизвести";
 			this->button4->UseVisualStyleBackColor = true;
+			this->button4->Click += gcnew System::EventHandler(this, &MyForm::button4_Click);
 			// 
 			// button5
 			// 
@@ -147,12 +150,13 @@ namespace winForms {
 			this->button5->TabIndex = 8;
 			this->button5->Text = L"Стоп";
 			this->button5->UseVisualStyleBackColor = true;
+			this->button5->Click += gcnew System::EventHandler(this, &MyForm::button5_Click);
 			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(445, 241);
+			this->ClientSize = System::Drawing::Size(445, 229);
 			this->Controls->Add(this->button5);
 			this->Controls->Add(this->button4);
 			this->Controls->Add(this->button3);
@@ -170,6 +174,78 @@ namespace winForms {
 
 #pragma endregion
 
+	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
+
+		OpenFileDialog ^ openFileDialog1 = gcnew OpenFileDialog();
+		openFileDialog1->Filter = "Audio Files|*.wav";
+		openFileDialog1->InitialDirectory = "f:\\Музыка:\\";
+		openFileDialog1->Title = "Выбери аудио файл";
+
+		if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+		{
+			textBox1->Text = openFileDialog1->FileName->ToString();
+
+			FileStream^ fs = gcnew FileStream(openFileDialog1->FileName, FileMode::Open, FileAccess::Read);
+
+			size = fs->Length;
+
+			for (int i = 0; i < size; i++)
+			{
+				buffer[i] = fs->ReadByte();
+			}
+		}
+	}
+
+	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
+		Console::Beep();
+		for (int i = 45; i < 45 + textBox2->Text->Length; i++)
+		{
+			buffer[i] = textBox2->Text[i - 45];
+		}
+
+		textBox2->Text = "";
+
+		SaveFileDialog ^ saveFile = gcnew SaveFileDialog();
+		saveFile->Filter = "Audio Files|*.wav";
+		saveFile->InitialDirectory = "f:\\Музыка:\\";
+		saveFile->Title = "Сохранить файл";
+
+		if (saveFile->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+		{
+			FileStream^ fs = gcnew FileStream(saveFile->FileName, FileMode::OpenOrCreate);
+			textBox1->Text = saveFile->FileName->ToString();
+
+			for (int i = 0; i < size; i++)
+			{
+				fs->WriteByte(buffer[i]);
+			}
+			fs->Close();
+		}
+	}
+	private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {
+		Console::Beep();
+		Console::Beep();
+
+		for (int i = 45; i < 60; i++)
+		{
+			textBox2->AppendText(buffer[i].ToString());
+		}
+	}
+
+	private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e) {
+		SoundPlayer^ player = gcnew SoundPlayer();
+		if (textBox1->Text != "")
+		{
+			player->SoundLocation = textBox1->Text;
+			player->Load();
+			player->Play();
+		}
+	}
+	private: System::Void button5_Click(System::Object^  sender, System::EventArgs^  e) {
+		SoundPlayer^ player = gcnew SoundPlayer();
+		if (textBox1->Text != "")
+			player->Stop();
+	}
 
 	};
 }
