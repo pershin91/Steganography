@@ -1,4 +1,5 @@
 #pragma once
+#include <cstring>
 
 namespace winForms {
 
@@ -10,39 +11,27 @@ namespace winForms {
 	using namespace System::Drawing;
 	using namespace System::Media;
 	using namespace System::Text;
-
 	using namespace System::IO;
 
 
-	/// <summary>
-	/// —водка дл€ MyForm
-	/// </summary>
 	public ref class MyForm : public System::Windows::Forms::Form
 	{
 	public:
 		MyForm(void)
 		{
 			InitializeComponent();
-			//
-			//TODO: добавьте код конструктора
-			//
 		}\
 
 	public:
 		int size1 = 31000000;
 		int size2 = 31000000;
+		
 	private: System::Windows::Forms::Button^  button6;
 	public:
 		array<Char>^ buffer1 = gcnew array<Char>(size1);
-
-	public:
-
-	public:
 		array<Char>^ buffer2 = gcnew array<Char>(size2);
+		
 	protected:
-		/// <summary>
-		/// ќсвободить все используемые ресурсы.
-		/// </summary>
 		~MyForm()
 		{
 			if (components)
@@ -58,20 +47,16 @@ namespace winForms {
 	private: System::Windows::Forms::Button^  button3;
 	private: System::Windows::Forms::Button^  button4;
 	private: System::Windows::Forms::Button^  button5;
+	private: System::Windows::Forms::ListBox^  listBox1;
+	private: System::Windows::Forms::Label^  label2;
 
 	protected:
 
 	private:
-		/// <summary>
-		/// ќб€зательна€ переменна€ конструктора.
-		/// </summary>
 		System::ComponentModel::Container ^components;
 
 #pragma region Windows Form Designer generated code
-		/// <summary>
-		/// “ребуемый метод дл€ поддержки конструктора Ч не измен€йте 
-		/// содержимое этого метода с помощью редактора кода.
-		/// </summary>
+
 		void InitializeComponent(void)
 		{
 			this->button1 = (gcnew System::Windows::Forms::Button());
@@ -83,6 +68,8 @@ namespace winForms {
 			this->button4 = (gcnew System::Windows::Forms::Button());
 			this->button5 = (gcnew System::Windows::Forms::Button());
 			this->button6 = (gcnew System::Windows::Forms::Button());
+			this->listBox1 = (gcnew System::Windows::Forms::ListBox());
+			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// button1
@@ -106,7 +93,7 @@ namespace winForms {
 			// label1
 			// 
 			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(12, 147);
+			this->label1->Location = System::Drawing::Point(12, 257);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(0, 17);
 			this->label1->TabIndex = 2;
@@ -114,14 +101,14 @@ namespace winForms {
 			// textBox2
 			// 
 			this->textBox2->Enabled = false;
-			this->textBox2->Location = System::Drawing::Point(161, 151);
+			this->textBox2->Location = System::Drawing::Point(161, 261);
 			this->textBox2->Name = L"textBox2";
 			this->textBox2->Size = System::Drawing::Size(272, 22);
 			this->textBox2->TabIndex = 3;
 			// 
 			// button2
 			// 
-			this->button2->Location = System::Drawing::Point(12, 188);
+			this->button2->Location = System::Drawing::Point(12, 325);
 			this->button2->Name = L"button2";
 			this->button2->Size = System::Drawing::Size(208, 34);
 			this->button2->TabIndex = 4;
@@ -131,7 +118,7 @@ namespace winForms {
 			// 
 			// button3
 			// 
-			this->button3->Location = System::Drawing::Point(226, 188);
+			this->button3->Location = System::Drawing::Point(226, 325);
 			this->button3->Name = L"button3";
 			this->button3->Size = System::Drawing::Size(207, 34);
 			this->button3->TabIndex = 5;
@@ -163,7 +150,7 @@ namespace winForms {
 			// 
 			// button6
 			// 
-			this->button6->Location = System::Drawing::Point(12, 145);
+			this->button6->Location = System::Drawing::Point(12, 255);
 			this->button6->Name = L"button6";
 			this->button6->Size = System::Drawing::Size(143, 34);
 			this->button6->TabIndex = 9;
@@ -171,11 +158,33 @@ namespace winForms {
 			this->button6->UseVisualStyleBackColor = true;
 			this->button6->Click += gcnew System::EventHandler(this, &MyForm::button6_Click);
 			// 
+			// listBox1
+			// 
+			this->listBox1->Enabled = false;
+			this->listBox1->FormattingEnabled = true;
+			this->listBox1->ItemHeight = 16;
+			this->listBox1->Items->AddRange(gcnew cli::array< System::Object^  >(5) { L"", L"", L"", L"", L"" });
+			this->listBox1->Location = System::Drawing::Point(187, 134);
+			this->listBox1->Name = L"listBox1";
+			this->listBox1->Size = System::Drawing::Size(246, 84);
+			this->listBox1->TabIndex = 10;
+			// 
+			// label2
+			// 
+			this->label2->AutoSize = true;
+			this->label2->Location = System::Drawing::Point(12, 171);
+			this->label2->Name = L"label2";
+			this->label2->Size = System::Drawing::Size(153, 17);
+			this->label2->TabIndex = 11;
+			this->label2->Text = L"»нформаци€ о файле";
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(445, 228);
+			this->ClientSize = System::Drawing::Size(445, 369);
+			this->Controls->Add(this->label2);
+			this->Controls->Add(this->listBox1);
 			this->Controls->Add(this->button6);
 			this->Controls->Add(this->button5);
 			this->Controls->Add(this->button4);
@@ -206,21 +215,32 @@ namespace winForms {
 			textBox1->Text = openFileDialog1->FileName->ToString();
 
 			FileStream^ fs1 = gcnew FileStream(openFileDialog1->FileName, FileMode::Open, FileAccess::Read);
-
+			BinaryReader ^reader = gcnew BinaryReader(fs1);
 			size1 = fs1->Length;
+
+			for (int i = 0; i < 22; i++)
+			{
+				buffer1[i] = reader->ReadUInt16();
+			}
+			reader->BaseStream->Position = 0;
+			listBox1->Items[0] = "format WAVE";
+			listBox1->Items[1] = "sampleRate " + Convert::ToUInt16(buffer1[12]) + "hz";
+			listBox1->Items[2] = "numChannels " + Convert::ToUInt16(buffer1[11]);
+			listBox1->Items[3] = "bitsPerSample " + Convert::ToUInt16(buffer1[17]) + "bit";
+			listBox1->Items[4] = "Size" + size1 + "byte";
 
 			for (int i = 0; i < size1; i++)
 			{
 				buffer1[i] = fs1->ReadByte();
-			}
+			}	
 		}
 	}
 
 	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
 		Console::Beep();
-		for (int i = 45; i < 45 + size2; i++)
+		for (int i = 124; i < 124 + size2; i++)
 		{
-			buffer1[i] = buffer2[i-45];
+			buffer1[i] = buffer2[i- 124];
 		}
 
 		SaveFileDialog ^ saveFile = gcnew SaveFileDialog();
@@ -243,8 +263,12 @@ namespace winForms {
 	private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {
 		Console::Beep();
 		Console::Beep();
+		
+		int a = Convert::ToUInt16(buffer1[25]);
+		a = a ^ 1;
+		listBox1->Items[5] = a;
 
-		for (int i = 45; i < 45 + size2; i++)
+		for (int i = 124; i < 124 + size2; i++)
 		{
 			//richTextBox1->AppendText(buffer1[i].ToString());
 		}
@@ -282,9 +306,9 @@ namespace winForms {
 			for (int i = 0; i < size2; i++)
 			{
 				buffer2[i] = fs2->ReadByte();
-				//richTextBox1->AppendText(buffer2[i].ToString());
 			}
 		}
 	}
+
 };
 }
