@@ -1,5 +1,4 @@
 #pragma once
-#include <cstring>
 
 namespace winForms {
 
@@ -13,7 +12,6 @@ namespace winForms {
 	using namespace System::Text;
 	using namespace System::IO;
 
-
 	public ref class MyForm : public System::Windows::Forms::Form
 	{
 	public:
@@ -25,9 +23,6 @@ namespace winForms {
 	public:
 		int size1 = 31000000;
 		int size2 = 31000000;
-		
-	private: System::Windows::Forms::Button^  button6;
-	public:
 		array<Char>^ buffer1 = gcnew array<Char>(size1);
 		array<Char>^ buffer2 = gcnew array<Char>(size2);
 		
@@ -39,6 +34,8 @@ namespace winForms {
 				delete components;
 			}
 		}
+
+	private: System::Windows::Forms::Button^  button6;
 	private: System::Windows::Forms::Button^  button1;
 	private: System::Windows::Forms::TextBox^  textBox1;
 	private: System::Windows::Forms::Label^  label1;
@@ -49,11 +46,7 @@ namespace winForms {
 	private: System::Windows::Forms::Button^  button5;
 	private: System::Windows::Forms::ListBox^  listBox1;
 	private: System::Windows::Forms::Label^  label2;
-
-	protected:
-
-	private:
-		System::ComponentModel::Container ^components;
+	private: System::ComponentModel::Container ^components;
 
 #pragma region Windows Form Designer generated code
 
@@ -163,10 +156,10 @@ namespace winForms {
 			this->listBox1->Enabled = false;
 			this->listBox1->FormattingEnabled = true;
 			this->listBox1->ItemHeight = 16;
-			this->listBox1->Items->AddRange(gcnew cli::array< System::Object^  >(5) { L"", L"", L"", L"", L"" });
+			this->listBox1->Items->AddRange(gcnew cli::array< System::Object^  >(6) { L"", L"", L"", L"", L"", L"" });
 			this->listBox1->Location = System::Drawing::Point(187, 134);
 			this->listBox1->Name = L"listBox1";
-			this->listBox1->Size = System::Drawing::Size(246, 84);
+			this->listBox1->Size = System::Drawing::Size(246, 100);
 			this->listBox1->TabIndex = 10;
 			// 
 			// label2
@@ -223,11 +216,11 @@ namespace winForms {
 				buffer1[i] = reader->ReadUInt16();
 			}
 			reader->BaseStream->Position = 0;
-			listBox1->Items[0] = "format WAVE";
-			listBox1->Items[1] = "sampleRate " + Convert::ToUInt16(buffer1[12]) + "hz";
-			listBox1->Items[2] = "numChannels " + Convert::ToUInt16(buffer1[11]);
-			listBox1->Items[3] = "bitsPerSample " + Convert::ToUInt16(buffer1[17]) + "bit";
-			listBox1->Items[4] = "Size" + size1 + "byte";
+			listBox1->Items[0] = "format		WAVE";
+			listBox1->Items[1] = "sampleRate	" + Convert::ToUInt16(buffer1[12]) + "hz";
+			listBox1->Items[2] = "numChannels	" + Convert::ToUInt16(buffer1[11]);
+			listBox1->Items[3] = "bitsPerSample	" + Convert::ToUInt16(buffer1[17]) + "bit";
+			listBox1->Items[4] = "Size1		" + size1 + "byte";
 
 			for (int i = 0; i < size1; i++)
 			{
@@ -237,10 +230,12 @@ namespace winForms {
 	}
 
 	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
-		Console::Beep();
+
 		for (int i = 124; i < 124 + size2; i++)
 		{
 			buffer1[i] = buffer2[i- 124];
+			//buffer1[i] = buffer1[i]-63;
+			//i++;
 		}
 
 		SaveFileDialog ^ saveFile = gcnew SaveFileDialog();
@@ -261,16 +256,26 @@ namespace winForms {
 		}
 	}
 	private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {
-		Console::Beep();
-		Console::Beep();
-		
-		int a = Convert::ToUInt16(buffer1[25]);
-		a = a ^ 1;
-		listBox1->Items[5] = a;
-
-		for (int i = 124; i < 124 + size2; i++)
+		for (int i = 0; i <size2; i++)
 		{
-			//richTextBox1->AppendText(buffer1[i].ToString());
+			buffer2[i] = buffer1[i + 124];
+		}
+
+		SaveFileDialog ^ saveFile = gcnew SaveFileDialog();
+		saveFile->Filter = "Text Files|*.txt";
+		saveFile->InitialDirectory = "f:\\Музыка:\\";
+		saveFile->Title = "Сохранить файл";
+
+		if (saveFile->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+		{
+			FileStream^ fs1 = gcnew FileStream(saveFile->FileName, FileMode::OpenOrCreate);
+			textBox2->Text = saveFile->FileName->ToString();
+
+			for (int i = 0; i < size2; i++)
+			{
+				fs1->WriteByte(buffer2[i]);
+			}
+			fs1->Close();
 		}
 	}
 
@@ -302,11 +307,13 @@ namespace winForms {
 			FileStream^ fs2 = gcnew FileStream(openFileDialog1->FileName, FileMode::Open, FileAccess::Read);
 
 			size2 = fs2->Length;
-
+			listBox1->Items[5] = "Size2		" + size2 + "byte";
+			if (size1 > size2 * 8 + 124)
 			for (int i = 0; i < size2; i++)
 			{
 				buffer2[i] = fs2->ReadByte();
 			}
+			else MessageBox::Show("Недостаточно места в файле !");
 		}
 	}
 
