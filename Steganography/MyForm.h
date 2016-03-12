@@ -230,12 +230,13 @@ namespace winForms {
 	}
 
 	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
-
-		for (int i = 124; i < 124 + size2; i++)
+		int i1 = 124;
+		for (int i = 124; i < 124 + size2*2; i++)
 		{
-			buffer1[i] = buffer2[i- 124];
+			buffer1[i] = buffer2[i1- 124];
 			//buffer1[i] = buffer1[i]-63;
-			//i++;
+			i++;
+			i1++;
 		}
 
 		SaveFileDialog ^ saveFile = gcnew SaveFileDialog();
