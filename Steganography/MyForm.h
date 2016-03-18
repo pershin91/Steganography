@@ -21,11 +21,12 @@ namespace winForms {
 		}\
 
 	public:
-		int size1 = 31000000;
-		int size2 = 31000000;
-		array<Char>^ buffer1 = gcnew array<Char>(size1);
-		array<Char>^ buffer2 = gcnew array<Char>(size2);
-		
+		int size1, size2;
+		array<UInt16>^ buffer1;
+	private: System::Windows::Forms::TextBox^  textBox3;
+	public:
+		array<Char>^ buffer2;
+	
 	protected:
 		~MyForm()
 		{
@@ -34,6 +35,7 @@ namespace winForms {
 				delete components;
 			}
 		}
+
 
 	private: System::Windows::Forms::Button^  button6;
 	private: System::Windows::Forms::Button^  button1;
@@ -63,6 +65,7 @@ namespace winForms {
 			this->button6 = (gcnew System::Windows::Forms::Button());
 			this->listBox1 = (gcnew System::Windows::Forms::ListBox());
 			this->label2 = (gcnew System::Windows::Forms::Label());
+			this->textBox3 = (gcnew System::Windows::Forms::TextBox());
 			this->SuspendLayout();
 			// 
 			// button1
@@ -171,11 +174,19 @@ namespace winForms {
 			this->label2->TabIndex = 11;
 			this->label2->Text = L"»нформаци€ о файле";
 			// 
+			// textBox3
+			// 
+			this->textBox3->Location = System::Drawing::Point(16, 204);
+			this->textBox3->Name = L"textBox3";
+			this->textBox3->Size = System::Drawing::Size(145, 22);
+			this->textBox3->TabIndex = 12;
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(445, 369);
+			this->Controls->Add(this->textBox3);
 			this->Controls->Add(this->label2);
 			this->Controls->Add(this->listBox1);
 			this->Controls->Add(this->button6);
@@ -213,101 +224,40 @@ namespace winForms {
 			FileStream^ fs1 = gcnew FileStream(openFileDialog1->FileName, FileMode::Open, FileAccess::Read);
 			BinaryReader ^reader = gcnew BinaryReader(fs1);
 			size1 = fs1->Length;
-
-			for (int i = 0; i < 22; i++)
+			buffer1 = gcnew array<UInt16>(size1);
+			for (int i = 0; i < size1/2; i++)
 			{
 				buffer1[i] = reader->ReadUInt16();
 			}
-			reader->BaseStream->Position = 0;
+
 			listBox1->Items[0] = "format		WAVE";
 			listBox1->Items[1] = "sampleRate	" + Convert::ToUInt16(buffer1[12]) + "hz";
 			listBox1->Items[2] = "numChannels	" + Convert::ToUInt16(buffer1[11]);
 			listBox1->Items[3] = "bitsPerSample	" + Convert::ToUInt16(buffer1[17]) + "bit";
 			listBox1->Items[4] = "Size1		" + size1 + "byte";
-
-			for (int i = 0; i < size1; i++)
-			{
-				buffer1[i] = fs1->ReadByte();
-			}	
 		}
 	}
 
 	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) {
+		
+		buffer1[22] = Convert::ToChar(size2 & 0xffff);		//пр€чем размер файла в аудио
+		buffer1[23] = Convert::ToChar(size2>>16 & 0xffff);
+	
 		int i1 = 0;
-		int bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7, bit_buf0, bit_buf1, bit_buf2, bit_buf3, bit_buf4, bit_buf5, bit_buf6, bit_buf7;
-		for (int i = 124; i < 124 + size2*4; i++)
+		for (int i = 62; i < 62 + size2*2; i++)
 		{	
-			// читаем по битам сообщение
-			int Byte_buf = Convert::ToUInt16(buffer2[i1]);
-			if (Byte_buf & 0x01) { bit0 = 1; } else { bit0 = 0; }
-			if (Byte_buf & 0x02) { bit1 = 1; } else { bit1 = 0; }
-			if (Byte_buf & 0x04) { bit2 = 1; } else { bit2 = 0; }
-			if (Byte_buf & 0x08) { bit3 = 1; } else { bit3 = 0; }
-			if (Byte_buf & 0x10) { bit4 = 1; } else { bit4 = 0; }
-			if (Byte_buf & 0x20) { bit5 = 1; } else { bit5 = 0; }
-			if (Byte_buf & 0x40) { bit6 = 1; } else { bit6 = 0; }
-			if (Byte_buf & 0x80) { bit7 = 1; } else { bit7 = 0; }
+			int buf_txt = Convert::ToUInt16(buffer2[i1]);
 			i1++;
-			// читаем по битам байт 1
-			int Byte_buf1 = Convert::ToUInt16(buffer1[i]);
-			if (Byte_buf1 & 0x01) { bit_buf0 = 1; } else { bit_buf0 = 0; }
-			if (Byte_buf1 & 0x02) { bit_buf1 = 1; } else { bit_buf1 = 0; }
-			if (Byte_buf1 & 0x04) { bit_buf2 = 1; } else { bit_buf2 = 0; }
-			if (Byte_buf1 & 0x08) { bit_buf3 = 1; } else { bit_buf3 = 0; }
-
-			if ((bit0 == 1) & (bit_buf0 == 1)) {}
-			else if ((bit0 == 0) & (bit_buf0 == 0)) {}
-			else if ((bit0 == 1) & (bit_buf0 == 0)) Byte_buf1 = Byte_buf1 + 0x01;
-			else if ((bit0 == 0) & (bit_buf0 == 1)) Byte_buf1 = Byte_buf1 - 0x01;
-
-			if ((bit1 == 1) & (bit_buf1 == 1)) {}
-			else if ((bit1 == 0) & (bit_buf1 == 0)) {}
-			else if ((bit1 == 1) & (bit_buf1 == 0)) Byte_buf1 = Byte_buf1 + 0x02;
-			else if ((bit1 == 0) & (bit_buf1 == 1)) Byte_buf1 = Byte_buf1 - 0x02;
-
-			if ((bit2 == 1) & (bit_buf2 == 1)) {}
-			else if ((bit2 == 0) & (bit_buf2 == 0)) {}
-			else if ((bit2 == 1) & (bit_buf2 == 0)) Byte_buf1 = Byte_buf1 + 0x04;
-			else if ((bit2 == 0) & (bit_buf2 == 1)) Byte_buf1 = Byte_buf1 - 0x04;
-
-			if ((bit3 == 1) & (bit_buf3 == 1)) {}
-			else if ((bit3 == 0) & (bit_buf3 == 0)) {}
-			else if ((bit3 == 1) & (bit_buf3 == 0)) Byte_buf1 = Byte_buf1 + 0x08;
-			else if ((bit3 == 0) & (bit_buf3 == 1)) Byte_buf1 = Byte_buf1 - 0x08;
-
-			buffer1[i] = Convert::ToChar(Byte_buf1);
+			int buf_wav1 = Convert::ToUInt16(buffer1[i]);
+			buf_wav1 = buf_wav1 & ~(0x0f);
+			buf_wav1 = buf_wav1 | (buf_txt & (0x0f));
+			buffer1[i] = Convert::ToChar(buf_wav1);
 			i++;
-			i++;
-
-			//читаем по битам байт 2
-			int Byte_buf2 = Convert::ToUInt16(buffer1[i]);
-			if (Byte_buf2 & 0x01) { bit_buf4 = 1; } else { bit_buf4 = 0; }
-			if (Byte_buf2 & 0x02) { bit_buf5 = 1; } else { bit_buf5 = 0; }
-			if (Byte_buf2 & 0x04) { bit_buf6 = 1; } else { bit_buf6 = 0; }
-			if (Byte_buf2 & 0x08) { bit_buf7 = 1; } else { bit_buf7 = 0; }
-
-			if ((bit4 == 1) & (bit_buf4 == 1)) {}
-			else if ((bit4 == 0) & (bit_buf4 == 0)) {}
-			else if ((bit4 == 1) & (bit_buf4 == 0)) Byte_buf2 = Byte_buf2 + 0x01;
-			else if ((bit4 == 0) & (bit_buf4 == 1)) Byte_buf2 = Byte_buf2 - 0x01;
-
-			if ((bit5 == 1) & (bit_buf5 == 1)) {}
-			else if ((bit5 == 0) & (bit_buf5 == 0)) {}
-			else if ((bit5 == 1) & (bit_buf5 == 0)) Byte_buf2 = Byte_buf2 + 0x02;
-			else if ((bit5 == 0) & (bit_buf5 == 1)) Byte_buf2 = Byte_buf2 - 0x02;
-
-			if ((bit6 == 1) & (bit_buf6 == 1)) {}
-			else if ((bit6 == 0) & (bit_buf6 == 0)) {}
-			else if ((bit6 == 1) & (bit_buf6 == 0)) Byte_buf2 = Byte_buf2 + 0x04;
-			else if ((bit6 == 0) & (bit_buf6 == 1)) Byte_buf2 = Byte_buf2 - 0x04;
-
-			if ((bit7 == 1) & (bit_buf7 == 1)) {}
-			else if ((bit7 == 0) & (bit_buf7 == 0)) {}
-			else if ((bit7 == 1) & (bit_buf7 == 0)) Byte_buf2 = Byte_buf2 + 0x08;
-			else if ((bit7 == 0) & (bit_buf7 == 1)) Byte_buf2 = Byte_buf2 - 0x08;
-
-			buffer1[i] = Convert::ToChar(Byte_buf2);
-			i++;
+			int buf_wav2 = Convert::ToUInt16(buffer1[i]);
+			buf_wav2 = buf_wav2 & ~(0x0f);
+			buf_txt = buf_txt >> 4;
+			buf_wav2 = buf_wav2 | (buf_txt & (0x0f));
+			buffer1[i] = Convert::ToChar(buf_wav2);
 		}
 
 		SaveFileDialog ^ saveFile = gcnew SaveFileDialog();
@@ -318,46 +268,31 @@ namespace winForms {
 		if (saveFile->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 		{
 			FileStream^ fs1 = gcnew FileStream(saveFile->FileName, FileMode::OpenOrCreate);
+			BinaryWriter ^writer = gcnew BinaryWriter(fs1);
 			textBox1->Text = saveFile->FileName->ToString();
-
-			for (int i = 0; i < size1; i++)
+			
+			for (int i = 0; i < size1/2; i++)
 			{
-				fs1->WriteByte(buffer1[i]);
+				writer->Write(buffer1[i]);
 			}
 			fs1->Close();
 		}
 	}
+
 	private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) {
+		int s = Convert::ToUInt32(buffer1[22] | buffer1[23]<<16);	//размер спр€танного файла
 		int i1 = 0;
-		int bit0, bit1, bit2, bit3, bit4, bit5, bit6, bit7, bit_buf0, bit_buf1, bit_buf2, bit_buf3, bit_buf4, bit_buf5, bit_buf6, bit_buf7;
-
-		for (int i = 124; i < size1; i++)
+		for (int i = 62; i < size1/2; i++)
 		{
-			int Byte_buf1 = Convert::ToUInt16(buffer1[i]);
-			if (Byte_buf1 & 0x01) { bit_buf4 = 1; } else { bit_buf4 = 0; }
-			if (Byte_buf1 & 0x02) { bit_buf5 = 1; } else { bit_buf5 = 0; }
-			if (Byte_buf1 & 0x04) { bit_buf6 = 1; } else { bit_buf6 = 0; }
-			if (Byte_buf1 & 0x08) { bit_buf7 = 1; } else { bit_buf7 = 0; }
+			int buf_txt = 0;
+			int buf_wav1 = Convert::ToUInt16(buffer1[i]);
+			buf_wav1 = buf_wav1 & 0x0f;
 			i++;
-			i++;
-			int Byte_buf2 = Convert::ToUInt16(buffer1[i]);
-			if (Byte_buf2 & 0x01) { bit_buf0 = 1; } else { bit_buf0 = 0; }
-			if (Byte_buf2 & 0x02) { bit_buf1 = 1; } else { bit_buf1 = 0; }
-			if (Byte_buf2 & 0x04) { bit_buf2 = 1; } else { bit_buf2 = 0; }
-			if (Byte_buf2 & 0x08) { bit_buf3 = 1; } else { bit_buf3 = 0; }
-			i++;
-
-			int Byte_buf = Convert::ToUInt16(buffer2[i1]);
-			Byte_buf = 0;
-			if (bit_buf4 == 1) Byte_buf = Byte_buf + 0x01;
-			if (bit_buf5 == 1) Byte_buf = Byte_buf + 0x02;
-			if (bit_buf6 == 1) Byte_buf = Byte_buf + 0x04;
-			if (bit_buf7 == 1) Byte_buf = Byte_buf + 0x08;
-			if (bit_buf0 == 1) Byte_buf = Byte_buf + 0x10;
-			if (bit_buf1 == 1) Byte_buf = Byte_buf + 0x20;
-			if (bit_buf2 == 1) Byte_buf = Byte_buf + 0x40;
-			if (bit_buf3 == 1) Byte_buf = Byte_buf + 0x80;
-			buffer1[i1] = Convert::ToChar(Byte_buf);
+			int buf_wav2 = Convert::ToUInt16(buffer1[i]);
+			buf_wav2 = buf_wav2 & 0x0f;
+			buf_wav2 = buf_wav2 << 4;
+			buf_txt = buf_wav2 | buf_wav1;
+			buffer1[i1] = Convert::ToChar(buf_txt);
 			i1++;
 		}
 
@@ -368,12 +303,13 @@ namespace winForms {
 
 		if (saveFile->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 		{
-			FileStream^ fs1 = gcnew FileStream(saveFile->FileName, FileMode::OpenOrCreate);
+			FileStream^ fs1 = gcnew FileStream(saveFile->FileName, FileMode::OpenOrCreate, FileAccess::Write);
+			BinaryWriter^ writer = gcnew BinaryWriter(fs1);
 			textBox2->Text = saveFile->FileName->ToString();
 
-			for (int i = 0; i < size1; i++)
+			for (int i = 0; i < s; i++)
 			{
-				fs1->WriteByte(buffer1[i]);
+				writer->Write(buffer1[i]);
 			}
 			fs1->Close();
 		}
@@ -407,7 +343,9 @@ namespace winForms {
 			FileStream^ fs2 = gcnew FileStream(openFileDialog1->FileName, FileMode::Open, FileAccess::Read);
 
 			size2 = fs2->Length;
+			buffer2 = gcnew array<Char>(size2);
 			listBox1->Items[5] = "Size2		" + size2 + "byte";
+			
 			if (size1 > size2 * 4 + 124)
 			for (int i = 0; i < size2; i++)
 			{
